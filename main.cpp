@@ -32,12 +32,6 @@
 
 #include <Poco/DOM/AutoPtr.h>
 #include <Poco/Util/IniFileConfiguration.h>
-/*#include <Poco/DOM/DOMParser.h>
-#include <Poco/DOM/Document.h>
-#include <Poco/DOM/NodeIterator.h>
-#include <Poco/DOM/NodeFilter.h>
-#include <Poco/DOM/AutoPtr.h>
-#include <Poco/SAX/InputSource.h>*/
 
 
 #include <string>
