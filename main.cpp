@@ -104,6 +104,7 @@ try
     Poco::Net::ICMPClient icmpClient(Poco::Net::IPAddress::IPv4);
 //  Poco::Net::SocketAddress socketAddress("192.168.1.49:80");
     Poco::Net::SocketAddress socketAddress;  
+    cping p(icmpClient);  
     
     AutoPtr<IniFileConfiguration> pConf(new IniFileConfiguration("maquinas.txt"));	
    
@@ -132,7 +133,7 @@ try
            maq = ips +"."+ keys1.at(c1);
         cout  << "  +" << pConf->getString(maq) << endl; 
         socketAddress =  Poco::Net::SocketAddress(pConf->getString(maq)+":80");
-        cping p(icmpClient);    
+   
         p.ping(socketAddress,5);
         }   
     }    

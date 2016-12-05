@@ -47,6 +47,7 @@
             <linkerLibLibItem>PocoUtil.dll</linkerLibLibItem>
             <linkerLibLibItem>PocoXML.dll</linkerLibLibItem>
             <linkerLibLibItem>PocoZip.dll</linkerLibLibItem>
+            <linkerLibLibItem>curses</linkerLibLibItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>

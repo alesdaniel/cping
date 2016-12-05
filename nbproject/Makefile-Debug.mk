@@ -52,7 +52,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-lPocoCrypto.dll -lPocoData.dll -lPocoDataSQLite.dll -lPocoFoundation.dll -lPocoJSON.dll -lPocoNet.dll -lPocoNetSSL.dll -lPocoUtil.dll -lPocoXML.dll -lPocoZip.dll
+LDLIBSOPTIONS=-lPocoCrypto.dll -lPocoData.dll -lPocoDataSQLite.dll -lPocoFoundation.dll -lPocoJSON.dll -lPocoNet.dll -lPocoNetSSL.dll -lPocoUtil.dll -lPocoXML.dll -lPocoZip.dll -lcurses
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
