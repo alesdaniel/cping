@@ -52,7 +52,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-lPocoCrypto.dll -lPocoData.dll -lPocoDataSQLite.dll -lPocoFoundation.dll -lPocoJSON.dll -lPocoNet.dll -lPocoNetSSL.dll -lPocoUtil.dll -lPocoXML.dll -lPocoZip.dll -lcurses
+LDLIBSOPTIONS=-lPocoCrypto.dll -lPocoData.dll -lPocoDataSQLite.dll -lPocoFoundation.dll -lPocoJSON.dll -lPocoNet.dll -lPocoNetSSL.dll -lPocoUtil.dll -lPocoXML.dll -lPocoZip.dll -lmenu -lncurses -lpanel
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
@@ -65,7 +65,7 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/cping.exe: ${OBJECTFILES}
 ${OBJECTDIR}/main.o: main.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
+	$(COMPILE.cc) -g -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
 
 # Subprojects
 .build-subprojects:

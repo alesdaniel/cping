@@ -35,6 +35,9 @@
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
+        <ccTool>
+          <standard>8</standard>
+        </ccTool>
         <linkerTool>
           <linkerLibItems>
             <linkerLibLibItem>PocoCrypto.dll</linkerLibLibItem>
@@ -47,7 +50,9 @@
             <linkerLibLibItem>PocoUtil.dll</linkerLibLibItem>
             <linkerLibLibItem>PocoXML.dll</linkerLibLibItem>
             <linkerLibLibItem>PocoZip.dll</linkerLibLibItem>
-            <linkerLibLibItem>curses</linkerLibLibItem>
+            <linkerLibLibItem>menu</linkerLibLibItem>
+            <linkerLibLibItem>ncurses</linkerLibLibItem>
+            <linkerLibLibItem>panel</linkerLibLibItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>

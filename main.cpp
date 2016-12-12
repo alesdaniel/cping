@@ -33,9 +33,12 @@
 #include <Poco/DOM/AutoPtr.h>
 #include <Poco/Util/IniFileConfiguration.h>
 
-
+#include <curses.h>
+#include <panel.h>
 #include <string>
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 using namespace std;
 using Poco::AutoPtr;
@@ -51,6 +54,7 @@ class cping
             p_client.pingReply += Poco::Delegate<cping, Poco::Net::ICMPEventArgs>(this, &cping::onReply);
 	    p_client.pingError += Poco::Delegate<cping, Poco::Net::ICMPEventArgs>(this, &cping::onError);            
             p_client.pingEnd   += Poco::Delegate<cping, Poco::Net::ICMPEventArgs>(this, &cping::onEnd);            
+            iniciascr();
 	}
 	~cping() //destructor
 	{
@@ -58,18 +62,27 @@ class cping
             p_client.pingReply -= Poco::Delegate<cping, Poco::Net::ICMPEventArgs>(this, &cping::onReply);
 	    p_client.pingError -= Poco::Delegate<cping, Poco::Net::ICMPEventArgs>(this, &cping::onError);                        
             p_client.pingEnd   -= Poco::Delegate<cping, Poco::Net::ICMPEventArgs>(this, &cping::onEnd);                        
+            cierrascr();
 	}
     void onBegin(const void* pSender, Poco::Net::ICMPEventArgs& args)
     {
-      cout << "Iniciando" << endl;
+    //  cout << "Iniciando" << endl;
     }
     void onReply(const void* pSender, Poco::Net::ICMPEventArgs& args)
     {
-      cout << "Respuesta Host " << args.hostName() << " Tam " << args.dataSize() << " Tiempo " << args.replyTime() << " TTL " <<	args.ttl() << endl;      
+      linl++;
+      mvwprintw(boxl, linl, 1, "Resp: %s Tam %d Tie %d TTL %d \n", args.hostName().c_str(), args.dataSize(),args.replyTime(),args.ttl());
+      update_panels();
+      doupdate();      
+      //  cout << "Respuesta Host " << args.hostName() << " Tam " << args.dataSize() << " Tiempo " << args.replyTime() << " TTL " <<	args.ttl() << endl;      
     }    
     void onError(const void* pSender, Poco::Net::ICMPEventArgs& args)
     {
-	cout << Poco::format("Error: %s ", args.error()) << endl;
+      line++;
+      mvwprintw(boxe, line, 1, "Error: %s \n",args.error().c_str());
+      update_panels();
+      doupdate();              
+     //cout << Poco::format("Error: %s ", args.error()) << endl;
     }
     void onEnd(const void* pSender, Poco::Net::ICMPEventArgs& args)
     {
@@ -89,9 +102,50 @@ class cping
     {
 	return p_client.ping(address, repeat);
     }
+    void muestra_p(std::string dato)
+    {
+     linp++;   
+     mvwprintw(boxp, linp, 1, "%s", dato.c_str());   
+    }
 
     private:
+        WINDOW *boxp, *boxl, *boxe;    
+        PANEL  *panelp, *panell, *panele;
+        int linp = 0, linl = 0, line = 0;
+    void iniciascr()
+    {   
+        initscr();
+        cbreak();
+        noecho();
+	boxp = newwin(25, 30, 0, 0);
+	boxl = newwin(12, 50, 0, 30);
+	boxe = newwin(13, 50, 12, 30);;
         
+        box(boxp, 0, 1);
+        box(boxl, 0, 1);
+        box(boxe, 0, 1);
+    
+        scrollok(boxp,TRUE);
+        scrollok(boxl,TRUE);
+        scrollok(boxe,TRUE);
+    
+        panelp = new_panel(boxp);
+        panell = new_panel(boxl);    
+        panele = new_panel(boxe);
+        
+        update_panels();
+        doupdate();
+        top_panel(panelp);      
+    }
+    
+    void cierrascr()
+    {
+    getch();    
+    delwin(boxp);
+    delwin(boxl);
+    delwin(boxp);
+    endwin();    
+    }
     protected:    
         Poco::Net::ICMPClient&	p_client;
 };
@@ -118,23 +172,27 @@ try
     pConf->keys(keys1);
 
     pConf->keys("sec", keys);
-    cout << keys.size() << endl;
+//    cout << keys.size() << endl;
     for (int c = 0;c < keys.size();c++) // escanea las secciones 
     { 
-        cout << keys.at(c).data() << endl;
+     //   cout << keys.at(c).data() << endl;
+        p.muestra_p(keys.at(c).data());
     //   secc = "sec." + keys.at(c);
         secc = "sec.";
-        cout << " +" <<  pConf->getString(secc + keys.at(c)) << endl;
+       //cout << " +" <<  pConf->getString(secc + keys.at(c)) << endl;
+        p.muestra_p(" +" + pConf->getString(secc + keys.at(c)));
         ips = pConf->getString(secc + keys.at(c));
     // cout << pConf->getString(ips);
         pConf->keys(ips, keys1); 
         for (int c1 = 0;c1 < keys1.size();c1++)
         {
            maq = ips +"."+ keys1.at(c1);
-        cout  << "  +" << pConf->getString(maq) << endl; 
+        //cout  << "  +" << pConf->getString(maq) << endl;
+        p.muestra_p("  +" + pConf->getString(maq));        
         socketAddress =  Poco::Net::SocketAddress(pConf->getString(maq)+":80");
    
         p.ping(socketAddress,5);
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }   
     }    
   
