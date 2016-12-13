@@ -47,6 +47,7 @@ using Poco::Util::IniFileConfiguration;
 class cping
 {
     public:
+        int error;         
 	cping(Poco::Net::ICMPClient& client): //constructor
                 p_client	(client) //inicializa
 	{
@@ -70,18 +71,26 @@ class cping
     }
     void onReply(const void* pSender, Poco::Net::ICMPEventArgs& args)
     {
-      linl++;
-      mvwprintw(boxl, linl, 1, "Resp: %s Tam %d Tie %d TTL %d \n", args.hostName().c_str(), args.dataSize(),args.replyTime(),args.ttl());
+    //  linl++;
+      //mvwprintw(boxl, linl, 1, "Resp: %s Tam %d Tie %d TTL %d \n", args.hostName().c_str(), args.dataSize(),args.replyTime(),args.ttl());
+      wprintw(boxl, " Resp: %s Tam %d Tie %d TTL %d \n", args.hostName().c_str(), args.dataSize(),args.replyTime(),args.ttl());
+      box(boxl, 0, 0);    
       update_panels();
-      doupdate();      
+      doupdate();
+      if (error < 0) 
+          error = 0;
+      error++;
       //  cout << "Respuesta Host " << args.hostName() << " Tam " << args.dataSize() << " Tiempo " << args.replyTime() << " TTL " <<	args.ttl() << endl;      
     }    
     void onError(const void* pSender, Poco::Net::ICMPEventArgs& args)
     {
-      line++;
-      mvwprintw(boxe, line, 1, "Error: %s \n",args.error().c_str());
+  //    line++;
+     // mvwprintw(boxe, line, 1, "Error: %s \n",args.error().c_str());
+      wprintw(boxe," Error: %s \n",args.error().c_str());
+      box(boxe, 0, 0);
       update_panels();
       doupdate();              
+      error--;
      //cout << Poco::format("Error: %s ", args.error()) << endl;
     }
     void onEnd(const void* pSender, Poco::Net::ICMPEventArgs& args)
@@ -104,14 +113,16 @@ class cping
     }
     void muestra_p(std::string dato)
     {
-     linp++;   
-     mvwprintw(boxp, linp, 1, "%s", dato.c_str());   
+ //    linp++;   
+   //  mvwprintw(boxp, linp, 1, "%s", dato.c_str());
+     wprintw(boxp, " %s \n", dato.c_str());
+     box(boxp, 0, 0);     
     }
 
     private:
         WINDOW *boxp, *boxl, *boxe;    
         PANEL  *panelp, *panell, *panele;
-        int linp = 0, linl = 0, line = 0;
+ //       int linp = 0, linl = 0, line = 0;
     void iniciascr()
     {   
         initscr();
@@ -121,9 +132,9 @@ class cping
 	boxl = newwin(12, 50, 0, 30);
 	boxe = newwin(13, 50, 12, 30);;
         
-        box(boxp, 0, 1);
-        box(boxl, 0, 1);
-        box(boxe, 0, 1);
+        box(boxp, 0, 0);
+        box(boxl, 0, 0);
+        box(boxe, 0, 0);
     
         scrollok(boxp,TRUE);
         scrollok(boxl,TRUE);
@@ -151,8 +162,7 @@ class cping
 };
 
 int main(int /*argc*/, char** /*argv*/)
-{
-    
+{   
 try 
    {    
     Poco::Net::ICMPClient icmpClient(Poco::Net::IPAddress::IPv4);
@@ -161,11 +171,11 @@ try
     cping p(icmpClient);  
     
     AutoPtr<IniFileConfiguration> pConf(new IniFileConfiguration("maquinas.txt"));	
-   
     //std::string path = pConf->hasProperty("MyApplication");
     std::string secc;
     std::string ips;
     std::string maq;
+    std::string msgerror;
     IniFileConfiguration::Keys keys;
     IniFileConfiguration::Keys keys1;
     pConf->keys(keys);
@@ -179,8 +189,10 @@ try
         p.muestra_p(keys.at(c).data());
     //   secc = "sec." + keys.at(c);
         secc = "sec.";
+        p.error = 0;        
        //cout << " +" <<  pConf->getString(secc + keys.at(c)) << endl;
         p.muestra_p(" +" + pConf->getString(secc + keys.at(c)));
+            
         ips = pConf->getString(secc + keys.at(c));
     // cout << pConf->getString(ips);
         pConf->keys(ips, keys1); 
@@ -188,12 +200,22 @@ try
         {
            maq = ips +"."+ keys1.at(c1);
         //cout  << "  +" << pConf->getString(maq) << endl;
-        p.muestra_p("  +" + pConf->getString(maq));        
-        socketAddress =  Poco::Net::SocketAddress(pConf->getString(maq)+":80");
-   
-        p.ping(socketAddress,5);
+        if (keys1.at(c1) == "err") {
+    //        p.muestra_p(" --Err" + pConf->getString(maq));
+           msgerror = pConf->getString(maq);
+        } else
+        {
+          p.muestra_p("  +" + pConf->getString(maq));        
+          socketAddress =  Poco::Net::SocketAddress(pConf->getString(maq)+":80");        
+          p.ping(socketAddress,5);
+        }  
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        }   
+        }
+        if (p.error < 0)
+        {
+          cout << "Error en: "<<  msgerror << " <" << p.error << "> " << endl; 
+          return 1;
+        }  
     }    
   
     }

@@ -1,21 +1,40 @@
 ; Orden de secciones
 [sec]
-sec1=adm
-sec2=2
-sec3=3
-sec4=4
-sec5=5
-sec6=6
+sec1=dv1
+sec2=dvadm
+sec3=dvneu
+sec4=dvant
+sec5=adm
+sec6=rrhh
 ; ips por seccion 
+; err determina donde esta el error ojo va sin comillas
+[dv1]
+ip1 = 192.168.1.167
+ip2 = 192.168.1.3
+;ip3 = 192.168.1.2
+err = Error en Oficina encargado chequear switch! 
+[dvadm]
+ip1 = 192.168.1.45
+ip2 = 192.168.1.51
+ip3 = 192.168.1.97
+err = Error en switch oficina nochero
+[dvneu]
+ip1 = 192.168.1.39
+ip2 = 192.168.1.201
+ip3 = 192.168.1.205
+ip4 = 192.168.1.207
+ip4 = 192.168.1.73
+err = Error en switch neumaticos
+[dvant]
+ip1 = 192.168.1.20
+err = Error en antena duppini
 [adm]
-ip1 = 192.168.1.1
-ip2 = 192.168.1.2
-ip3 = 192.168.1.3
-[2]
-ip1 = 192.168.1.4
-ip2 = 192.168.1.5
-ip3 = 192.168.1.6
-[3]
-ip1 = 192.168.1.7
-ip2 = 192.168.1.8
-ip3 = 192.168.1.9
+ip1 = 192.168.1.56
+ip2 = 192.168.1.50
+ip3 = 192.168.1.76
+err = Error en administracion
+[rrhh]
+ip1 = 192.168.1.89
+ip2 = 192.168.1.168
+ip3 = 192.168.1.78
+err = Error en rrhh
