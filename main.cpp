@@ -33,7 +33,7 @@
 #include <Poco/DOM/AutoPtr.h>
 #include <Poco/Util/IniFileConfiguration.h>
 
-#include <curses.h>
+#include <ncurses.h>
 #include <panel.h>
 #include <string>
 #include <iostream>
@@ -86,7 +86,9 @@ class cping
     {
   //    line++;
      // mvwprintw(boxe, line, 1, "Error: %s \n",args.error().c_str());
+      attron(COLOR_PAIR(1));  
       wprintw(boxe," Error: %s \n",args.error().c_str());
+      attroff(COLOR_PAIR(1));
       box(boxe, 0, 0);
       update_panels();
       doupdate();              
@@ -116,15 +118,27 @@ class cping
  //    linp++;   
    //  mvwprintw(boxp, linp, 1, "%s", dato.c_str());
      wprintw(boxp, " %s \n", dato.c_str());
-     box(boxp, 0, 0);     
+     box(boxp, 0, 0);
+     update_panels();
+     doupdate();
     }
-
+    
+    void muestra_error(std::string dato)
+    {      
+      attron(COLOR_PAIR(1));
+      wprintw(boxe, "----------------------------------------\n");        
+      wprintw(boxe, " %s \n", dato.c_str());
+      box(boxe, 0, 0);
+      update_panels();
+      doupdate();         
+    }
     private:
         WINDOW *boxp, *boxl, *boxe;    
         PANEL  *panelp, *panell, *panele;
  //       int linp = 0, linl = 0, line = 0;
     void iniciascr()
     {   
+        slk_init(0);
         initscr();
         cbreak();
         noecho();
@@ -143,6 +157,10 @@ class cping
         panelp = new_panel(boxp);
         panell = new_panel(boxl);    
         panele = new_panel(boxe);
+
+        start_color();
+        init_pair(0, COLOR_BLACK, COLOR_RED);
+        init_pair(1, COLOR_BLACK, COLOR_GREEN);  
         
         update_panels();
         doupdate();
@@ -162,7 +180,7 @@ class cping
 };
 
 int main(int /*argc*/, char** /*argv*/)
-{   
+{
 try 
    {    
     Poco::Net::ICMPClient icmpClient(Poco::Net::IPAddress::IPv4);
@@ -183,6 +201,7 @@ try
 
     pConf->keys("sec", keys);
 //    cout << keys.size() << endl;
+    p.muestra_p(" "); //primer linea en blanco   
     for (int c = 0;c < keys.size();c++) // escanea las secciones 
     { 
      //   cout << keys.at(c).data() << endl;
@@ -213,11 +232,12 @@ try
         }
         if (p.error < 0)
         {
-          cout << "Error en: "<<  msgerror << " <" << p.error << "> " << endl; 
+        //  cout << "Error en: "<<  msgerror << " <" << p.error << "> " << endl; 
+          p.muestra_error("Error en: " + msgerror);
           return 1;
         }  
     }    
-  
+    p.muestra_error("No hay error"); 
     }
 catch(Poco::IOException& e)
     {
